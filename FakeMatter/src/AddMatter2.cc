@@ -4,8 +4,31 @@
 
 #include <cassert>
 #include <cmath>
-
+#include <iostream>
 using namespace std;
+
+// solve for r 
+/*range of r from 2m to the domain*/
+double fun(double rho, double r);
+// {
+ // DECLARE_CCTK_PARAMETERS;
+//return exp(2*h*sqrt(1-2*param_m/r)*r + 2 * param_m * atanh(sqrt(1-2* param_m /r)))-pow(rho,2);
+//}
+
+double solve(double rho);
+//{
+//do/uble low=2,up=200,mid=(low+up)/2;
+//while(up-low>1e-6)
+//{
+//double y = fun(rho,mid);
+//if(y>0)up=mid;
+//else if(y<0)low=mid;
+//else break;
+//mid=(low+up)/2;
+//}
+//return mid;
+//}
+
 
 // Matrix determinant
 static CCTK_REAL determinant(const CCTK_REAL (&g)[3][3]) {
@@ -48,36 +71,47 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  // Horizon surface
-  const int hi = horizon_index;
-  if (!sf_active[hi]) {
-    CCTK_WARN(CCTK_WARN_ALERT, "No horizon found at this time");
-    return;
-  }
-  // Origin (centre) of horizon
-  const CCTK_REAL hc[3] = {sf_origin_x[hi], sf_origin_y[hi], sf_origin_z[hi]};
 
+cerr << "here2!";
+
+  // Horizon surface
+
+//  const int hi = horizon_index;
+
+ // if (!sf_active[hi]) {
+//	  cerr << "iteration=" << cctk_iteration << " "  << cctk_time << "\n";
+  //  CCTK_WARN(CCTK_WARN_ALERT, "No horizon found at this time");
+    //return;
+
+  //}
+//cerr << "here1!";
+ 
+ // Origin (centre) of horizon
+ // const CCTK_REAL hc[3] = {sf_origin_x[hi], sf_origin_y[hi], sf_origin_z[hi]};
+//cerr << "here!";
   // Constant expansion surface
-  const int si = surface_index;
-  if (!sf_active[si]) {
-    CCTK_WARN(CCTK_WARN_ALERT,
-              "No constant expansion surface found at this time");
-    return;
-  }
+ // const int si = surface_index;
+ // if (!sf_active[si]) {
+    //CCTK_WARN(CCTK_WARN_ALERT,
+      //        "No constant expansion surface found at this time");
+   // return;
+  //}
+
   // Origin (centre) of constant expansion surface
-  const CCTK_REAL sc[3] = {sf_origin_x[si], sf_origin_y[si], sf_origin_z[si]};
+// CCTK_WARN(CCTK_WARN_ALERT, "loop!");
+// const  CCTK_REAL sc[3] = {sf_origin_x[si], sf_origin_y[si], sf_origin_z[si]};
 
   // Loop over all grid points
-  for (int k = 0; k < cctk_lsh[2]; ++k) {
-    for (int j = 0; j < cctk_lsh[1]; ++j) {
-      for (int i = 0; i < cctk_lsh[0]; ++i) {
+ for (int k = 0; k < cctk_lsh[2]; ++k) {
+   for (int j = 0; j < cctk_lsh[1]; ++j) {
+     for (int i = 0; i < cctk_lsh[0]; ++i) {
         int ijk = CCTK_GFINDEX3D(cctkGH, i, j, k);
         // Are we inside the constant expansion surface?
-        if (smask[ijk] < 1) {
-
-          // Current point
-          const CCTK_REAL xx[3] = {x[ijk], y[ijk], z[ijk]};
-
+	// and are we outside some negative expansion surface
+       //        if (smask[ijk] < 1) {
+	   // Current point
+// CCTK_WARN(CCTK_WARN_ALERT, "adding fake matter now");          
+ // const CCTK_REAL xx[3] = {x[ijk], y[ijk], z[ijk]};
           // Projection from 3d onto surface:
           //   theta in [0; pi]
           //   phi in [0; 2pi]
@@ -97,32 +131,32 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
 
           // TODO: The constant expansion has a different origin --
           // take this into account
-          const CCTK_REAL dx[3] = {xx[0] - hc[0], xx[1] - hc[1], xx[2] - hc[2]};
+ //         const CCTK_REAL dx[3] = {xx[0] - hc[0], xx[1] - hc[1], xx[2] - hc[2]};
 
-          const CCTK_REAL radius =
-              sqrt(pow(dx[0], 2) + pow(dx[1], 2) + pow(dx[2], 2));
-          const CCTK_REAL rho = hypot(dx[0], dx[1]);
-          const CCTK_REAL theta = atan2(rho, -dx[2]);
-          assert(theta >= 0 && theta <= M_PI);
-          const CCTK_REAL phi = fmod(atan2(dx[1], dx[0]) + 2 * M_PI, 2 * M_PI);
-          assert(phi >= 0 && phi < 2 * M_PI);
+  //        const CCTK_REAL radius =
+    //          sqrt(pow(dx[0], 2) + pow(dx[1], 2) + pow(dx[2], 2));
+      //    const CCTK_REAL rho = hypot(dx[0], dx[1]);
+       //   const CCTK_REAL theta = atan2(rho, -dx[2]);
+        //  assert(theta >= 0 && theta <= M_PI);
+        //  const CCTK_REAL phi = fmod(atan2(dx[1], dx[0]) + 2 * M_PI, 2 * M_PI);
+         // assert(phi >= 0 && phi < 2 * M_PI);
 
           // Find radius
           // Find nearest grid point on surface
           // TODO: Use (at least) linear interpolation instead
-          const int itheta =
-              lrint((theta - sf_origin_theta[hi]) / sf_delta_theta[hi]);
-          const int jphi = lrint((phi - sf_origin_phi[hi]) / sf_delta_phi[hi]);
-          assert(itheta >= 0 && itheta < sf_ntheta[hi]);
-          assert(jphi >= 0 && jphi < sf_nphi[hi]);
+        //  const int itheta =
+        //      lrint((theta - sf_origin_theta[hi]) / sf_delta_theta[hi]);
+        //  const int jphi = lrint((phi - sf_origin_phi[hi]) / sf_delta_phi[hi]);
+         // assert(itheta >= 0 && itheta < sf_ntheta[hi]);
+          //assert(jphi >= 0 && jphi < sf_nphi[hi]);
 
           // Horizon radius
-          const int hij = itheta + maxntheta * (jphi + maxnphi * hi);
-          const CCTK_REAL horizon_radius = sf_radius[hij];
+         // const int hij = itheta + maxntheta * (jphi + maxnphi * hi);
+         // const CCTK_REAL horizon_radius = sf_radius[hij];
 
           // Constant expansion surface radius
-          const int sij = itheta + maxntheta * (jphi + maxnphi * si);
-          const CCTK_REAL surface_radius = sf_radius[sij];
+         // const int sij = itheta + maxntheta * (jphi + maxnphi * si);
+         // const CCTK_REAL surface_radius = sf_radius[sij];
 
           // Approximate expansion at current point
           //   Theta(rH) = 0
@@ -134,11 +168,11 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           //     m*(rS-rH) = Theta
           //     m = Theta / (rS - rH)
           //     b = - m * rH
-          const CCTK_REAL m =
-              surface_expansion / (surface_radius - horizon_radius);
-          const CCTK_REAL b = -m * horizon_radius;
+        //  const CCTK_REAL m =
+          //    surface_expansion / (surface_radius - horizon_radius);
+         // const CCTK_REAL b = -m * horizon_radius;
 
-          const CCTK_REAL expansion = m * radius + b;
+          //const CCTK_REAL expansion = m * radius + b;
 
           // Get metric
           const CCTK_REAL g[3][3] = {{gxx[ijk], gxy[ijk], gxz[ijk]},
@@ -151,17 +185,17 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           inverse(g, detg, gu);
 
           // Find spacelike vector er^a orthoginal to the surface:
-          CCTK_REAL er[3] = {dx[0], dx[1], dx[2]};
-          CCTK_REAL len = length(gu, er);
-          if (len >= 1.0e-10)
-            normalize(er, len);
-          else
-            for (int d = 0; d < 3; ++d)
-              er[d] = 0.0;
+        //  CCTK_REAL er[3] = {dx[0], dx[1], dx[2]};
+        //  CCTK_REAL len = length(gu, er);
+         // if (len >= 1.0e-10)
+          //  normalize(er, len);
+          //else
+           // for (int d = 0; d < 3; ++d)
+            //  er[d] = 0.0;
 
           // Calculate surface two-metric q_ab
           //   qu^ab = gu^ab - er^a er^b
-          CCTK_REAL qu[3][3];
+         /* CCTK_REAL qu[3][3];
           for (int a = 0; a < 3; ++a)
             for (int b = 0; b < 3; ++b)
               qu[a][b] = gu[a][b] - er[a] * er[b];
@@ -172,20 +206,34 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
               for (int c = 0; c < 3; ++c)
                 for (int d = 0; d < 3; ++d)
                   q[a][b] += g[a][c] * g[b][d] * qu[c][d];
-            }
+            }*/
 
           // Calculate fake pressure
-          const CCTK_REAL press =
-              param_a * (1 + 2 * param_a) /
-              (64 * M_PI * pow(param_M, 2) *
-               pow(param_a + pow(param_M, 2) * pow(expansion, 2), 2));
+      //    const CCTK_REAL press =
+       //       param_a * (1 + 2 * param_a) /
+         //     (64 * M_PI * pow(param_M, 2) *
+           //    pow(param_a + pow(param_M, 2) * pow(expansion, 2), 2));
+           
+	  //cerr << "press=" << press << "\n";
 
           // Define fake T_ab
-          CCTK_REAL T[3][3];
-          for (int a = 0; a < 3; ++a)
-            for (int b = 0; b < 3; ++b)
-              T[a][b] = 1.0 / 3.0 * press * q[a][b];
+//	  if (expansion > -0.04) {
+        //  CCTK_REAL T[3][3];
+         // for (int a = 0; a < 3; ++a)
+         //   for (int b = 0; b < 3; ++b)
+           //    T[a][b] = 1.0 / 3.0 * press * q[a][b];
 
+  //        cerr << "quyy=" << qu[1][1] << "\n";
+//	  cerr << "gyy=" << g[1][1] << "\n";
+  //	  cerr << "qxx=" << q[0][0] << "\n";
+	  cerr << "gtt=" << pow(alp[ijk],2) << "\n";
+    cerr << "gyz=" << g[1][2] << "\n";
+    cerr << "gxy=" << g[0][1] << "\n";
+    cerr << "gxz=" << g[0][2] << "\n";
+    cerr << "gzz=" << g[2][2] << "\n";
+    cerr << "gyy=" << g[1][1] << "\n";
+//          cerr << "Tyy==" << T[1][1] << "\n";
+  //        cerr << "Txx=" << T[0][0] << "\n";
           // // Ensure that the constraints hold
           // // McLachlan says:
           // //   rho   ~ T00 - 2 beta[ua] T0[la] + beta[ua] beta[ub] T[la,lb]
@@ -205,21 +253,27 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           // for (int a = 0; a < 3; ++a)
           //   for (int b = 0; b < 3; ++b)
           //     Ttt += 2 * beta[a] * Tt[a] - beta[a] * beta[b] * T[a][b];
+	  double rho1 = r[ijk];
+          double rr = solve(rho1); 
+          eTxx[ijk] += param_a * param_m * (param_m * (4 * pow(x[ijk],2)- pow(h * rr,2)*(pow(y[ijk],2)+pow(z[ijk],2)))+(1+param_a)* rr * (-2*pow(x[ijk],2)+pow(h*rr,2)*(pow(y[ijk],2)+pow(z[ijk],2))))/(pow(h*rr*(-2* param_m + rr + param_a * rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTyy[ijk] += param_a * param_m * (2*(2* param_m -(1+ param_a) * rr ) * pow(y[ijk],2)+ pow( h * rr , 2) * (-param_m +rr +param_a * rr) * (pow(x[ijk],2)+pow(z[ijk],2)))/(pow(h*rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxy[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2+pow(h*rr,2))- param_m *(4+pow(h*rr,2)))* x[ijk] * y[ijk]/(pow(h*rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2+pow(h*rr,2))- param_m *(4+pow(h*rr,2)))* x[ijk] * z[ijk]/(pow(h*rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTyz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2+pow(h*rr,2))- param_m *(4+pow(h*rr,2)))* z[ijk] * y[ijk]/(pow(h*rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTzz[ijk] += param_a * param_m *(2*(2* param_m -(1+ param_a) * rr ) * pow(z[ijk],2)+ pow( h * rr,2) * (-param_m +rr +param_a *rr)*(pow(x[ijk],2)+pow(y[ijk],2)))/(pow(h*rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
 
-          const CCTK_REAL Ttt = 0;
-          const CCTK_REAL Tt[3] = {0, 0, 0};
-
-          eTtt[ijk] += Ttt;
-          eTtx[ijk] += Tt[0];
-          eTty[ijk] += Tt[1];
-          eTtz[ijk] += Tt[2];
-          eTxx[ijk] += T[0][0];
-          eTxy[ijk] += T[0][1];
-          eTxz[ijk] += T[0][2];
-          eTyy[ijk] += T[1][1];
-          eTyz[ijk] += T[1][2];
-          eTzz[ijk] += T[2][2];
-        }
+cerr << "x=" << x[ijk] << "\n";
+cerr << "y=" << y[ijk] << "\n";
+cerr << "z=" << z[ijk] << "\n";
+cerr << "r=" << rr << "\n";
+            cerr << "Txx=" << eTxx[ijk] << "\n";
+            cerr << "Tyy=" << eTyy[ijk] << "\n";
+            cerr << "Tzz=" << eTzz[ijk] << "\n";
+            cerr << "Txy=" << eTxy[ijk] << "\n";
+            cerr << "Txz=" << eTxz[ijk] << "\n";
+            cerr << "Tyz=" << eTyz[ijk] << "\n";
+//	  }
+  //      }
       }
     }
   }

@@ -36,7 +36,12 @@ CCTK_REAL param_a "Pressure arameter a" STEERABLE=always
   *:* :: ""
 } 0.0
 
-CCTK_REAL param_M "Pressure arameter M" STEERABLE=always
+CCTK_REAL param_m "Pressure arameter m" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL h "parameter h for metric grr term" STEERABLE=always
 {
   *:* :: ""
 } 0.0

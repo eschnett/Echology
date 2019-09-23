@@ -3,7 +3,7 @@
 STORAGE: smask
 
 if (0 == 1) {
-  SCHEDULE FakeMatter_AddMatter IN SetTmunu
+  SCHEDULE FakeMatter_AddMatter IN AddToTmunu
   {
     LANG: C
   } "Add fake matter to Tmumu"
@@ -11,7 +11,12 @@ if (0 == 1) {
 
 
 
-SCHEDULE FakeMatter_AddMatter2 IN SetTmunu
+SCHEDULE FakeMatter_DefineMetric IN ADMBase_InitialData AFTER ADMBase_InitialData
+{
+  LANG: C
+} "Define the Metric"
+
+SCHEDULE FakeMatter_AddMatter2 IN AddToTmunu
 {
   LANG: C
 } "Add fake matter to Tmumu"
