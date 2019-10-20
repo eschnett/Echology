@@ -67,7 +67,7 @@ static void normalize(CCTK_REAL (&x)[3], CCTK_REAL len) {
     x[a] /= len;
 }
 
-extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
+extern "C" void FakeMatter_AddMatterexp(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
@@ -239,12 +239,12 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           //     Ttt += 2 * beta[a] * Tt[a] - beta[a] * beta[b] * T[a][b];
 	  double rho1 = r[ijk];
           double rr = solve(rho1); 
-          eTxx[ijk] += param_a * param_m * (param_m * (4 * pow(x[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))- pow(rr,2)*(pow(y[ijk],2)+pow(z[ijk],2)))+(1+param_a)* rr * (-2*pow(x[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)*(pow(y[ijk],2)+pow(z[ijk],2))))/(pow(rr*(-2* param_m + rr + param_a * rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
-          eTyy[ijk] += param_a * param_m * (2*(2* param_m -(1+ param_a) * rr ) * pow(y[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+ pow( rr , 2) * (-param_m +rr +param_a * rr) * (pow(x[ijk],2)+pow(z[ijk],2)))/(pow(rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
-          eTxy[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* x[ijk] * y[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
-          eTxz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* x[ijk] * z[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
-          eTyz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* z[ijk] * y[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
-          eTzz[ijk] += param_a * param_m *(2*(2* param_m -(1+ param_a) * rr ) * pow(z[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+ pow(rr,2) * (-param_m +rr +param_a *rr)*(pow(x[ijk],2)+pow(y[ijk],2)))/(pow(rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxx[ijk] += param_a * param_m * (param_m * (4 * pow(x[ijk],2)- pow(h * rr,2)*(pow(y[ijk],2)+pow(z[ijk],2)))+(1+param_a)* rr * (-2*pow(x[ijk],2)+pow(h*rr,2)*(pow(y[ijk],2)+pow(z[ijk],2))))/(pow(h*rr*(-2* param_m + rr + param_a * rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTyy[ijk] += param_a * param_m * (2*(2* param_m -(1+ param_a) * rr ) * pow(y[ijk],2)+ pow( h * rr , 2) * (-param_m +rr +param_a * rr) * (pow(x[ijk],2)+pow(z[ijk],2)))/(pow(h*rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxy[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2+pow(h*rr,2))- param_m *(4+pow(h*rr,2)))* x[ijk] * y[ijk]/(pow(h*rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2+pow(h*rr,2))- param_m *(4+pow(h*rr,2)))* x[ijk] * z[ijk]/(pow(h*rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTyz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2+pow(h*rr,2))- param_m *(4+pow(h*rr,2)))* z[ijk] * y[ijk]/(pow(h*rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTzz[ijk] += param_a * param_m *(2*(2* param_m -(1+ param_a) * rr ) * pow(z[ijk],2)+ pow( h * rr,2) * (-param_m +rr +param_a *rr)*(pow(x[ijk],2)+pow(y[ijk],2)))/(pow(h*rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
 
 //	  }
   //      }

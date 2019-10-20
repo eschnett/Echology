@@ -20,7 +20,7 @@ return pow(sqrt(1-2*param_m/r)*r + 2 * param_m * atanh(sqrt(1-2* param_m /r))+pa
 double solve(double rho)
 {
 DECLARE_CCTK_PARAMETERS;
-double low=2 * param_m ,up=10,mid=(low+up)/2;
+double low=2 * param_m ,up=20,mid=(low+up)/2;
 while(up-low>1e-6)
 {
 double y = fun(rho,mid);
@@ -32,7 +32,7 @@ mid=(low+up)/2;
 return mid;
 }
 
-extern "C" void FakeMatter_DefineMetric(CCTK_ARGUMENTS) {
+extern "C" void FakeMatter_DefineMetricexp(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
@@ -43,21 +43,19 @@ for (int k = 0; k < cctk_lsh[2]; ++k) {
         int ijk = CCTK_GFINDEX3D(cctkGH, i, j, k);
         double rho1 = r[ijk];
         double rr = solve(rho1);
- cerr << "r=" << rr << "\n";
- cerr << "rho=" << rho1 << "\n";
+// cerr << "r=" << rr << "\n";
+// cerr << "rho=" << rho1 << "\n";
 // define metric, gxx, alp, beta
 
-        gxx[ijk] = (pow(x[ijk], 4)+(pow(x[ijk], 2)+pow( rr, 2)) * (pow(y[ijk], 2)+pow(z[ijk], 2)))/pow( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
-        gyy[ijk] = (pow(y[ijk], 4)+(pow(y[ijk], 2)+pow( rr, 2)) * (pow(z[ijk], 2)+pow(x[ijk], 2)))/pow( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
-        gzz[ijk] = (pow(z[ijk], 4)+(pow(z[ijk], 4)+pow( rr, 2) )* (pow(y[ijk], 2)+pow(x[ijk], 2)))/pow( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
-        gxy[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * y[ijk])/pow( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
-        gxz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * z[ijk])/pow( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
-        gyz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * z[ijk] * y[ijk])/pow( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
+        gxx[ijk] = (pow(x[ijk], 2)+pow(h * rr, 2) * (pow(y[ijk], 2)+pow(z[ijk], 2)))/pow(h * (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
+        gyy[ijk] = (pow(y[ijk], 2)+pow(h * rr, 2) * (pow(z[ijk], 2)+pow(x[ijk], 2)))/pow(h * (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
+        gzz[ijk] = (pow(z[ijk], 2)+pow(h * rr, 2) * (pow(y[ijk], 2)+pow(x[ijk], 2)))/pow(h * (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
+        gxy[ijk] = (( 1- pow(h*rr, 2) ) * x[ijk] * y[ijk])/pow(h * (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
+        gxz[ijk] = (( 1- pow(h*rr, 2) ) * x[ijk] * z[ijk])/pow(h * (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
+        gyz[ijk] = (( 1- pow(h*rr, 2) ) * z[ijk] * y[ijk])/pow(h * (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)), 2);
 
         alp[ijk] = sqrt(1-2 * param_m / rr + param_a);
 cerr << "alp=" << alp[ijk] << "\n";
-cerr << "gxx=" << gxx[ijk] << "\n";
-cerr << "gxy=" << gxy[ijk] << "\n";
 /*
 do I need set beta=0?
  */

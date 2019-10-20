@@ -41,7 +41,7 @@ CCTK_REAL param_m "Pressure arameter m" STEERABLE=always
   *:* :: ""
 } 0.0
 
-CCTK_REAL h "parameter h for metric grr term" STEERABLE=always
+CCTK_REAL param_c "parameter c for shift lamba to positive value for all the domain" STEERABLE=always
 {
   *:* :: ""
 } 0.0
