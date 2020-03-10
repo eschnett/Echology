@@ -11,7 +11,7 @@ if (0 == 1) {
 
 
 
-SCHEDULE FakeMatter_DefineMetric IN ADMBase_InitialData AFTER ADMBase_InitialData
+SCHEDULE FakeMatter_DefineMetric IN ADMBase_PostInitial
 {
   LANG: C
 } "Define the Metric"

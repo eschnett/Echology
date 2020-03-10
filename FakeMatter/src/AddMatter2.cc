@@ -245,7 +245,18 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           eTxz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* x[ijk] * z[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
           eTyz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* z[ijk] * y[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
           eTzz[ijk] += param_a * param_m *(2*(2* param_m -(1+ param_a) * rr ) * pow(z[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+ pow(rr,2) * (-param_m +rr +param_a *rr)*(pow(x[ijk],2)+pow(y[ijk],2)))/(pow(rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
-
+//cerr << "r=" << rr << "\n";
+ //cerr << "rho=" << rho1 << "\n";
+//cerr << "gzz=" << gzz[ijk] << "\n";
+//cerr << "x=" << x[ijk] << "\n";
+//cerr << "y=" << y[ijk] << "\n";
+//cerr << "z=" << z[ijk] << "\n";
+//cerr << "eTxx=" << eTxx[ijk] << "\n";
+//cerr << "eTyy=" << eTyy[ijk] << "\n";
+//cerr << "eTzz=" << eTzz[ijk] << "\n";
+//cerr << "eTxy=" << eTxy[ijk] << "\n";
+//cerr << "eTxz=" << eTxz[ijk] << "\n";
+//cerr << "eTyz=" << eTyz[ijk] << "\n";
 //	  }
   //      }
       }
