@@ -57,12 +57,12 @@ for (int k = 0; k < cctk_lsh[2]; ++k) {
         double rr = solve(rho1);
 // define metric, gxx, alp, beta
 
-        gxx[ijk] = (pow(x[ijk], 4)+(pow(x[ijk], 2)+pow( rr, 2)) * (pow(y[ijk], 2)+pow(z[ijk], 2)))/pow( rho1, 2);
-        gyy[ijk] = (pow(y[ijk], 4)+(pow(y[ijk], 2)+pow( rr, 2)) * (pow(z[ijk], 2)+pow(x[ijk], 2)))/pow( rho1, 2);
-        gzz[ijk] = (pow(z[ijk], 4)+(pow(z[ijk], 2)+pow( rr, 2) )* (pow(y[ijk], 2)+pow(x[ijk], 2)))/pow( rho1, 2);
-        gxy[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * y[ijk])/pow( rho1, 2);
-        gxz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * z[ijk])/pow( rho1, 2);
-        gyz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * z[ijk] * y[ijk])/pow( rho1, 2);
+        gxx[ijk] = (pow(x[ijk], 4)+(pow(x[ijk], 2)+pow( rr, 2)) * (pow(y[ijk], 2)+pow(z[ijk], 2)))/pow( rho1, 4);
+        gyy[ijk] = (pow(y[ijk], 4)+(pow(y[ijk], 2)+pow( rr, 2)) * (pow(z[ijk], 2)+pow(x[ijk], 2)))/pow( rho1, 4);
+        gzz[ijk] = (pow(z[ijk], 4)+(pow(z[ijk], 2)+pow( rr, 2) )* (pow(y[ijk], 2)+pow(x[ijk], 2)))/pow( rho1, 4);
+        gxy[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * y[ijk])/pow( rho1, 4);
+        gxz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * z[ijk])/pow( rho1, 4);
+        gyz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * z[ijk] * y[ijk])/pow( rho1, 4);
 
         alp[ijk] = sqrt(1-2 * param_m / rr + param_a);
   if(isnan(gzz[ijk])){printf("nan in gzz at %d,%d,%d,%g,%g,%g,%g,%g\n",i,j,k,x[ijk],y[ijk],z[ijk],rho1,rr);}

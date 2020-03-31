@@ -67,9 +67,11 @@ extern "C" void FakeMatter_DefineMetric(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
 
 
-//int aa;
-//int bb = aa;
-//  printf ("isfinite(0.0) :%d\n",isfinite(0.0));
+
+double aa = 0/0;
+  printf ("isfinite(0.0) :%d\n",isfinite(0.0));
+ printf ("isfinite(0.0) :%d, %g, %d\n", isfinite(aa), 0/0,0/0);
+ printf ("isfinite(0.0) :%d, %g\n",isfinite(aa), 0/0);
 //  printf ("isfinite(1.0/0.0): %d\n",isfinite(1.0/0.0));
 //  printf ("isfinite(bb) : %d,%g\n",isfinite(bb),bb);
 //  printf ("!isfinite(bb) : %d,%g\n",!isfinite(bb),bb);
@@ -81,36 +83,42 @@ for (int k = 0; k < cctk_lsh[2]; ++k) {
     for (int i = 0; i < cctk_lsh[0]; ++i) {
 
         int ijk = CCTK_GFINDEX3D(cctkGH, i, j, k);
+       // double xx= x[ijk];
+       // double yy= y[ijk];
+       // double zz= z[ijk];
 // ver1 x,y,z<1e-2, why not stop there?? because I add ver2     
-        double xx=x[ijk];
-        double zz=z[ijk];
-        double yy=y[ijk];
-//  if(abs(x[ijk])<0.2&&abs(y[ijk])<0.2&&abs(z[ijk])<0.2){xx=0.2;yy=0.2;zz=0.2;}
-        double rho1=sqrt((pow(yy, 2)+pow(zz, 2)+pow(xx, 2)));
+      //  if(abs(x[ijk])<1e-2&&abs(y[ijk])<1e-2&&abs(z[ijk])<1e-2){xx=1e-2;yy=1e-2;zz=1e-2;}
+      //  double rho1=sqrt((pow(yy, 2)+pow(zz, 2)+pow(xx, 2)));
+        double rho1=sqrt((pow(y[ijk], 2)+pow(z[ijk], 2)+pow(x[ijk], 2)));
         double rr = solve(rho1);
 // define metric, gxx, alp, beta
 
-//ver4
+//ver1 normal define
+        gxx[ijk] = (pow(x[ijk], 4)+(pow(x[ijk], 2)+pow( rr, 2)) * (pow(y[ijk], 2)+pow(z[ijk], 2)))/pow( rho1, 4);
+        gyy[ijk] = (pow(y[ijk], 4)+(pow(y[ijk], 2)+pow( rr, 2)) * (pow(z[ijk], 2)+pow(x[ijk], 2)))/pow( rho1, 4);
+        gzz[ijk] = (pow(z[ijk], 4)+(pow(z[ijk], 2)+pow( rr, 2) )* (pow(y[ijk], 2)+pow(x[ijk], 2)))/pow( rho1, 4);
+        gxy[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * y[ijk])/pow( rho1, 4);
+        gxz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * z[ijk])/pow( rho1, 4);
+        gyz[ijk] = (( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * z[ijk] * y[ijk])/pow( rho1, 4);
 
-        double gxx1 =(pow(xx, 4)+(pow(xx, 2)+pow(rr, 2)) * (pow(yy, 2)+pow(zz, 2)))/(pow( rho1, 4));
-        double gyy1 =(pow(yy, 4)+(pow(yy, 2)+pow(rr, 2)) * (pow(zz, 2)+pow(xx, 2)))/(pow( rho1, 4));
-        double gzz1 =(pow(zz, 4)+(pow(zz, 2)+pow(rr, 2)) * (pow(yy, 2)+pow(xx, 2)))/(pow( rho1, 4));
-        double gxy1 = (( (pow(xx, 2)+pow(yy, 2)+pow(zz, 2)) - pow(rr, 2) ) * xx * yy)/(pow( rho1, 4));
-        double gxz1 = (( (pow(xx, 2)+pow(yy, 2)+pow(zz, 2)) - pow(rr, 2) ) * xx * zz)/(pow( rho1, 4));
-        double gyz1 = (( (pow(xx, 2)+pow(yy, 2)+pow(zz, 2)) - pow(rr, 2) ) * zz * yy)/(pow( rho1, 4));
+        alp[ijk] = sqrt(1-2 * param_m / rr + param_a);
+        
+/*
+        gxx[ijk] =(pow(xx, 4)+(pow(xx, 2)+pow(rr, 2)) * (pow(yy, 2)+pow(zz, 2)))/(pow( rho1, 4));
+        gyy[ijk] =(pow(yy, 4)+(pow(yy, 2)+pow(rr, 2)) * (pow(zz, 2)+pow(xx, 2)))/(pow( rho1, 4));
+        gzz[ijk] =(pow(zz, 4)+(pow(zz, 2)+pow(rr, 2)) * (pow(yy, 2)+pow(xx, 2)))/(pow( rho1, 4));
+        gxy[ijk] = (( (pow(xx, 2)+pow(yy, 2)+pow(zz, 2)) - pow(rr, 2) ) * xx * yy)/(pow( rho1, 4));
+        gxz[ijk] = (( (pow(xx, 2)+pow(yy, 2)+pow(zz, 2)) - pow(rr, 2) ) * xx * zz)/(pow( rho1, 4));
+        gyz[ijk] = (( (pow(xx, 2)+pow(yy, 2)+pow(zz, 2)) - pow(rr, 2) ) * zz * yy)/(pow( rho1, 4));
 
-        double alp1 = sqrt(1-2 * param_m / rr + param_a) ;
+        alp[ijk] = sqrt(1-2 * param_m / rr + param_a) ;
 
-        double gxx2=120;
-        double gyy2=120;
-        double gzz2=120;double gxy2=0; double gxz2=0; double gyz2=0; double alp2=1;
-if(rho1<0.1){gxx[ijk]= gxx2;gyy[ijk]=gyy2;gzz[ijk]=gzz2;gxy[ijk]=gxy2;gxz[ijk]=gxz2;gyz[ijk]=gyz2;alp[ijk]=alp2;}
-else if(rho1<0.2){gxx[ijk]=(1-rho1)*gxx2+rho1*gxx1;gyy[ijk]=(1-rho1)*gyy2+rho1*gyy1;gzz[ijk]=(1-rho1)*gzz2+rho1*gzz1;gxy[ijk]=(1-rho1)*gxy2+rho1*gxy1;gxz[ijk]=(1-rho1)*gxz2+rho1*gxz1;gyz[ijk]=(1-rho1)*gyz2+rho1*gyz1;alp[ijk]=(1-rho1)*alp2+rho1*alp1;}
-else {gxx[ijk]= gxx1;gyy[ijk]=gyy1;gzz[ijk]=gzz1;gxy[ijk]=gxy1;gxz[ijk]=gxz1;gyz[ijk]=gyz1;alp[ijk]=alp1;}
+*/
 
 //ver2 A+d/B+c indetermine?? at z=0.01??
-  /*      gxx[ijk] =(pow(x[ijk], 4)+(pow(x[ijk], 2)+pow(rr, 2)) * (pow(y[ijk], 2)+pow(z[ijk], 2))+1)/(pow( rho1, 4)+1e-2);
-          gyy[ijk] =(pow(y[ijk], 4)+(pow(y[ijk], 2)+pow(rr, 2)) * (pow(z[ijk], 2)+pow(x[ijk], 2))+1)/(pow( rho1, 4)+1e-2);
+  /*      gxx[ijk] =(pow(x[ijk], 4)+(pow(x[ijk], 2)+pow(rr, 2)) * (pow(y[ijk], 2)+pow(z[ijk], 2))+1);
+        gyy[ijk] = (pow( rho1, 4)+1e-2);
+       // gyy[ijk] =(pow(y[ijk], 4)+(pow(y[ijk], 2)+pow(rr, 2)) * (pow(z[ijk], 2)+pow(x[ijk], 2))+1)/(pow( rho1, 4)+1e-2);
         gzz[ijk] =(pow(z[ijk], 4)+(pow(z[ijk], 2)+pow(rr, 2)) * (pow(y[ijk], 2)+pow(x[ijk], 2))+1)/(pow( rho1, 4)+1e-2);
         gxy[ijk] = (1+( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * y[ijk])/(1e-2+pow( rho1, 4));
         gxz[ijk] = (1+( (pow(x[ijk], 2)+pow(y[ijk], 2)+pow(z[ijk], 2)) - pow(rr, 2) ) * x[ijk] * z[ijk])/(1e-2+pow( rho1, 4));
@@ -122,7 +130,7 @@ else {gxx[ijk]= gxx1;gyy[ijk]=gyy1;gzz[ijk]=gzz1;gxy[ijk]=gxy1;gxz[ijk]=gxz1;gyz
 
 
 // ver3. r^2 to sin[ w rho ] w= pi/6
-  printf ("isfinite(0.0/0.0)  : %d,%g\n",isfinite(0.0/0.0),0.0/0.0);
+//  printf ("isfinite(0.0/0.0)  : %d,%g\n",isfinite(0.0/0.0),0.0/0.0);
 
  
 
