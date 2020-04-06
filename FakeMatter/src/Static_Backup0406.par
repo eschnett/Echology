@@ -1,0 +1,465 @@
+ActiveThorns = "
+FakeMatter
+ADMBase
+ADMCoupling
+ADMMacros
+#AEILocalInterp
+#AHFinderDirect
+#Boundary
+Carpet
+CarpetIOASCII
+CarpetIOBasic
+CarpetIOHDF5
+CarpetIOScalar
+CarpetInterp
+CarpetLib
+CarpetReduce
+#CarpetSlab
+CartGrid3D
+CoordBase
+CoordGauge
+#Dissipation
+Formaline
+GenericFD
+IOUtil
+InitBase
+#LocalInterp
+#LoopControl
+ML_ADMConstraints
+ML_BSSN
+ML_BSSN_Helper
+MoL
+#Multipole
+NaNChecker
+NewRad
+#QuasiLocalMeasures
+ReflectionSymmetry
+#RotatingSymmetry180
+#Slab
+SpaceMask
+SphericalSurface
+StaticConformal
+#SummationByParts
+SymBase
+#TGRtensor
+Time
+TimerReport
+TmunuBase
+#Exact #TwoPunctures
+#WeylScal4
+"
+
+
+
+################################################################################
+# General setup
+################################################################################
+
+Cactus::cctk_run_title = "matter"
+
+Cactus::cctk_full_warnings = yes
+Cactus::highlight_warning_messages = no
+
+#Cactus::terminate = "time"
+#Cactus::cctk_final_time = 150.0   # 50.0
+#Cactus::cctk_final_time = 50.0   # 50.0
+Cactus::cctk_itlast = 100
+
+#SummationByParts::order = 4
+
+
+
+################################################################################
+# Domain
+################################################################################
+
+#Carpet::verbose = yes
+Carpet::veryverbose = yes
+
+Carpet::domain_from_coordbase = yes
+
+driver::ghost_size = 3
+
+CoordBase::domainsize = "minmax"
+
+
+CoordBase::xmin =  0.00
+CoordBase::ymin =  0.00
+CoordBase::zmin =  0.00
+CoordBase::xmax = +10.00
+CoordBase::ymax = +10.00
+CoordBase::zmax = +10.00
+CoordBase::dx   =    0.015625 * 2
+CoordBase::dy   =    0.015625 * 2
+CoordBase::dz   =    0.015625 * 2
+
+CoordBase::boundary_size_x_lower = 3
+CoordBase::boundary_size_y_lower = 3
+CoordBase::boundary_size_z_lower = 3
+CoordBase::boundary_size_x_upper = 3
+CoordBase::boundary_size_y_upper = 3
+CoordBase::boundary_size_z_upper = 3
+
+CoordBase::boundary_shiftout_x_lower = 1
+CoordBase::boundary_shiftout_z_lower = 1
+CoordBase::boundary_shiftout_y_lower = 1
+
+
+CartGrid3D::type = "coordbase"
+
+ReflectionSymmetry::reflection_z = yes
+ReflectionSymmetry::avoid_origin_z = no
+
+ReflectionSymmetry::reflection_y = yes
+ReflectionSymmetry::avoid_origin_y = no
+
+ReflectionSymmetry::reflection_x = yes
+ReflectionSymmetry::avoid_origin_x = no
+
+# Black holes
+
+#SphericalSurface::nsurfaces = 2
+#SphericalSurface::maxntheta = 39
+#SphericalSurface::maxnphi   = 76
+#
+#SphericalSurface::ntheta      [0] = 39
+#SphericalSurface::nphi        [0] = 76
+#SphericalSurface::nghoststheta[0] = 2
+#SphericalSurface::nghostsphi  [0] = 2
+#
+#SphericalSurface::ntheta      [1] = 39
+#SphericalSurface::nphi        [1] = 76
+#SphericalSurface::nghoststheta[1] = 2
+#SphericalSurface::nghostsphi  [1] = 2
+
+
+################################################################################
+# Physics
+################################################################################
+ FakeMatter::horizon_index          =  0
+ FakeMatter::surface_index          =  1
+ FakeMatter::surface_expansion      =  0.1
+ FakeMatter::param_a                =  0
+ FakeMatter::param_M                =  0.5
+ FakeMatter::param_c                =  3
+
+TmunuBase::stress_energy_storage = "yes"
+TmunuBase::stress_energy_at_RHS  = "yes"
+TmunuBase::timelevels            =  3
+TmunuBase::prolongation_type     = "none"
+TmunuBase::support_old_CalcTmunu_mechanism = "no"
+
+ADMMacros::spatial_order = 4
+
+ADMBase::metric_type = "physical"
+
+ADMBase::initial_data    = "cartesian minkowski"
+ADMBase::initial_lapse   = "one"
+ADMBase::initial_shift   = "zero"
+ADMBase::initial_dtlapse = "zero"
+ADMBase::initial_dtshift = "zero"
+
+#ADMBase::initial_data    = "exact"
+#ADMBase::initial_lapse   = "exact"
+#ADMBase::initial_shift   = "exact"
+#ADMBase::initial_dtlapse = "exact"
+#ADMBase::initial_dtshift = "exact"
+
+# needed for AHFinderDirect
+ADMBase::metric_timelevels = 3
+
+# Initial conditions
+
+Carpet::init_fill_timelevels = yes
+
+#Exact::exact_model = "Schwarzschild/BL"
+#Exact::Schwarzschild_BL__mass = 1.0
+#Exact::Schwarzschild_BL__epsilon = 1.0e-2   # may need to change this
+#if nans develop at puncture
+
+#TwoPunctures::par_b          =  1.168642873
+#TwoPunctures::par_m_plus     =  0.453
+#TwoPunctures::par_m_minus    =  0.453
+#TwoPunctures::par_P_plus [1] = +0.3331917498
+#TwoPunctures::par_P_minus[1] = -0.3331917498
+
+#TwoPunctures::grid_setup_method = "evaluation"
+
+#TwoPunctures::TP_epsilon = 1.0e-2
+#TwoPunctures::TP_Tiny    = 1.0e-2
+
+#TwoPunctures::verbose = yes
+
+# Time evolution
+
+ADMBase::evolution_method         = "ML_BSSN"
+ADMBase::lapse_evolution_method   = "ML_BSSN"
+ADMBase::shift_evolution_method   = "ML_BSSN"
+ADMBase::dtlapse_evolution_method = "ML_BSSN"
+ADMBase::dtshift_evolution_method = "ML_BSSN"
+
+ML_BSSN::harmonicN           = 1      # 1+log
+ML_BSSN::harmonicF           = 2.0    # 1+log
+ML_BSSN::ShiftGammaCoeff     = 0.75
+ML_BSSN::BetaDriver          = 1.0
+ML_BSSN::advectLapse         = 1
+ML_BSSN::advectShift         = 1
+
+ML_BSSN::MinimumLapse = 1.0e-8
+
+ML_BSSN::initial_boundary_condition = "extrapolate-gammas"
+ML_BSSN::rhs_boundary_condition = "NewRad"
+Boundary::radpower = 2
+
+#Dissipation::order = 5
+#Dissipation::vars  = "
+#ML_BSSN::ML_log_confac
+#ML_BSSN::ML_metric
+#ML_BSSN::ML_trace_curv
+#ML_BSSN::ML_curv
+#ML_BSSN::ML_Gamma
+#ML_BSSN::ML_lapse
+#ML_BSSN::ML_shift
+#ML_BSSN::ML_dtlapse
+#ML_BSSN::ML_dtshift
+#"
+
+#MoL::ODE_Method  = "RK4"
+#MoL::MoL_Intermediate_Steps = 4
+#MoL::MoL_Num_Scratch_Levels = 1
+MoL::ODE_Method  = "Euler"
+MoL::MoL_Intermediate_Steps = 1
+MoL::MoL_Num_Scratch_Levels = 0
+
+
+# Time::dtfac = 0.25
+Time::timestep_method = "given"
+Time::timestep = 0.01
+
+
+
+################################################################################
+# Horizons
+################################################################################
+
+#AHFinderDirect::set_mask_for_individual_horizon[1] = yes
+
+#AHFinderDirect::mask_radius_multiplier = 1.0
+#AHFinderDirect::mask_is_noshrink = no
+# AHFinderDirect::old_style_mask_gridfn_name = "FakeMatter::smask"
+
+# AHFinderDirect::verbose_level = "physics details"
+#AHFinderDirect::verbose_level = "algorithm details"
+
+#AHFinderDirect::find_every = 1
+
+#AHFinderDirect::run_at_CCTK_POST_RECOVER_VARIABLES = no
+
+#AHFinderDirect::geometry_interpolator_name = "Lagrange polynomial interpolation"
+#AHFinderDirect::geometry_interpolator_pars = "order=4"
+#AHFinderDirect::surface_interpolator_name  = "Lagrange polynomial interpolation"
+#AHFinderDirect::surface_interpolator_pars  = "order=4"
+
+#AHFinderDirect::output_h_every = 1
+
+#AHFinderDirect::N_horizons = 2
+
+# First individual horizon
+#AHFinderDirect::initial_guess__coord_sphere__radius     [1] =  0.25
+#AHFinderDirect::which_surface_to_store_info             [1] = 0
+#AHFinderDirect::reset_horizon_after_not_finding         [1] = no
+
+# stretched horizon1
+#AHFinderDirect::surface_definition                      [2] = "expansion"
+#AHFinderDirect::surface_selection                       [2] = "definition"
+#AHFinderDirect::desired_value                           [2] = 0.1
+#AHFinderDirect::initial_guess__coord_sphere__radius     [2] =  0.25
+#AHFinderDirect::which_surface_to_store_info             [2] = 1
+#AHFinderDirect::reset_horizon_after_not_finding         [2] = no
+
+#QuasiLocalMeasures::verbose = yes
+#QuasiLocalMeasures::interpolator = "Lagrange polynomial interpolation"
+#QuasiLocalMeasures::interpolator_options = "order=4"
+#QuasiLocalMeasures::spatial_order = 4
+
+#QuasiLocalMeasures::num_surfaces = 2
+#QuasiLocalMeasures::surface_index[0] = 0
+#QuasiLocalMeasures::surface_index[1] = 1
+
+################################################################################
+# Waveforms
+################################################################################
+
+#WeylScal4::offset   = 1e-8 
+#WeylScal4::fd_order = "4th" 
+#WeylScal4::verbose  = 0 
+
+#Multipole::l_max = 4
+#Multipole::nradii = 4
+#Multipole::out_every = 128
+#Multipole::radius[0] = 60
+#Multipole::radius[1] = 70
+#Multipole::radius[2] = 80
+#Multipole::radius[3] = 90
+#Multipole::variables = "WeylScal4::Psi4r{sw=-2 cmplx='WeylScal4::Psi4i' name='Psi4'}"
+
+
+
+################################################################################
+# Output
+################################################################################
+
+IO::out_dir = $parfile
+
+IOBasic::outInfo_every = 1   # 128
+IOBasic::outInfo_reductions = "norm2"
+IOBasic::outInfo_vars = "
+ML_ADMConstraints::H
+"
+
+IOScalar::one_file_per_group = yes
+
+IOScalar::outScalar_every = 1   # 128
+IOScalar::outScalar_vars = "
+TmunuBase::stress_energy_scalar
+TmunuBase::stress_energy_vector
+TmunuBase::stress_energy_tensor
+ADMBase::metric
+ADMBase::curv
+ADMBase::lapse
+ADMBase::shift
+ADMBase::dtlapse
+ADMBase::dtshift
+ML_ADMConstraints::ML_Ham
+ML_ADMConstraints::ML_mom
+"
+
+IOASCII::one_file_per_group = yes
+
+IOASCII::output_symmetry_points = no
+IOASCII::out3D_ghosts = no
+
+IOASCII::out0D_every = 1   # 128
+IOASCII::out0D_vars = "
+Carpet::timing
+CarpetReduce::weight
+ADMBase::metric
+ADMBase::curv
+ADMBase::lapse
+ADMBase::shift
+ADMBase::dtlapse
+ADMBase::dtshift
+ML_ADMConstraints::ML_Ham
+ML_ADMConstraints::ML_mom
+"
+
+IOASCII::out1D_every = 1   # 128
+IOASCII::out1D_vars = "
+CarpetReduce::weight
+ADMBase::metric
+ADMBase::curv
+ADMBase::lapse
+ADMBase::shift
+ADMBase::dtlapse
+ADMBase::dtshift
+ML_ADMConstraints::ML_Ham
+ML_ADMConstraints::ML_mom
+"
+
+# IOASCII::out3D_every = 1
+# IOASCII::out3D_vars = "
+#    FakeMatter::smask
+#    TmunuBase::eTtt
+#"
+
+# IOASCII::out2D_every = 8   # 128
+# IOASCII::out2D_vars = "
+#     SphericalSurface::sf_radius
+# "
+
+ IOHDF5::out3D_every                     = 1
+ IOHDF5::out3D_vars                      = "
+     Grid::Coordinates{out_every=1000000000 refinement_levels={0}}
+#     ML_BSSN::alpha
+#     ML_BSSN::phi
+     ML_BSSN::gt11
+     ML_BSSN::gt11rhs
+ #    ML_BSSN::gt33
+  #   ML_BSSN::gt23
+   #  ML_BSSN::gt13
+    # ML_BSSN::gt12
+    ML_BSSN::trK
+#     ML_BSSN::ML_Ham
+#     QuasiLocalMeasures::qlm_shapes{out_every = 8}
+#     QuasiLocalMeasures::qlm_coordinates{out_every = 8}
+#     QuasiLocalMeasures::qlm_tetrad_l{out_every = 8}
+#     QuasiLocalMeasures::qlm_tetrad_n{out_every = 8}
+#     QuasiLocalMeasures::qlm_tetrad_m{out_every = 8}
+#     QuasiLocalMeasures::qlm_newman_penrose{out_every = 8}
+#     QuasiLocalMeasures::qlm_weyl_scalars{out_every = 8}
+#     QuasiLocalMeasures::qlm_ricci_scalars{out_every = 8}
+#     QuasiLocalMeasures::qlm_twometric{out_every = 8}
+#     QuasiLocalMeasures::qlm_killing_vector{out_every = 8}
+#     QuasiLocalMeasures::qlm_killed_twometric{out_every = 8}
+#     QuasiLocalMeasures::qlm_invariant_coordinates{out_every = 8}
+#     WeylScal4::Psi4r
+#     WeylScal4::Psi4i
+ "
+
+IOHDF5::out_every = 1 #512
+IOHDF5::one_file_per_group = no
+IOHDF5::output_symmetry_points = no
+IOHDF5::out3D_ghosts = no
+IOHDF5::compression_level = 1
+IOHDF5::use_checksums = yes
+IOHDF5::out_vars = "
+TmunuBase::stress_energy_scalar
+TmunuBase::stress_energy_vector
+TmunuBase::stress_energy_tensor
+#FakeMatter::smask
+#     CarpetReduce::weight
+     ADMBase::metric
+     ADMBase::curv
+     ADMBase::lapse
+     ML_BSSN::alpha
+     ADMBase::shift
+     grid::coordinates
+#     ADMBase::dtlapse
+#     ADMBase::dtshift
+#     ML_ADMConstraints::ML_Ham
+#     ML_ADMConstraints::ML_mom
+"
+
+
+
+################################################################################
+# Introspection
+################################################################################
+
+TimerReport::out_every = 5120
+TimerReport::out_filename = "TimerReport"
+TimerReport::output_all_timers_together = yes
+TimerReport::output_all_timers_readable = yes
+TimerReport::n_top_timers = 100
+
+Carpet::output_timers_every = 5120
+CarpetLib::print_timestats_every = 5120
+CarpetLib::print_memstats_every  = 5120
+
+Carpet::poison_new_timelevels = no
+CarpetLib::poison_new_memory  = yes
+
+NaNChecker::verbose = "all"
+NaNChecker::check_every = 1 # 512
+NaNChecker::action_if_found = "terminate"
+NaNChecker::check_vars = "
+ML_BSSN::ML_log_confac
+ML_BSSN::ML_metric
+ML_BSSN::ML_trace_curv
+ML_BSSN::ML_curv
+ML_BSSN::ML_Gamma
+ML_BSSN::ML_lapse
+ML_BSSN::ML_shift
+ML_BSSN::ML_dtlapse
+ML_BSSN::ML_dtshift
+"
