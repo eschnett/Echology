@@ -7,10 +7,27 @@
 #include <iostream>
 using namespace std;
 
-#define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
+// solve for r 
+/*range of r from 2m to the domain*/
+double fun(double rho, double r);
+// {
+ // DECLARE_CCTK_PARAMETERS;
+//return exp(2*h*sqrt(1-2*param_m/r)*r + 2 * param_m * atanh(sqrt(1-2* param_m /r)))-pow(rho,2);
+//}
+
+double solve(double rho);
+//{
+//do/uble low=2,up=200,mid=(low+up)/2;
+//while(up-low>1e-6)
+//{
+//double y = fun(rho,mid);
+//if(y>0)up=mid;
+//else if(y<0)low=mid;
+//else break;
+//mid=(low+up)/2;
+//}
+//return mid;
+//}
 
 
 // Matrix determinant
@@ -174,12 +191,10 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
 
           // Calculate surface two-metric q_ab
           //   qu^ab = gu^ab - er^a er^b
-
          /* CCTK_REAL qu[3][3];
           for (int a = 0; a < 3; ++a)
             for (int b = 0; b < 3; ++b)
               qu[a][b] = gu[a][b] - er[a] * er[b];
-          
           CCTK_REAL q[3][3];
           for (int a = 0; a < 3; ++a)
             for (int b = 0; b < 3; ++b) {
@@ -223,12 +238,26 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           //   for (int b = 0; b < 3; ++b)
           //     Ttt += 2 * beta[a] * Tt[a] - beta[a] * beta[b] * T[a][b];
 	  double rho1 = r[ijk];
-          double dd = 1e-2;
-
-double g11= - 8* param_a * param_m / max(dd, rho1*(pow(param_m,2)+4*(-1+2*param_a)*param_m*rho1+4*pow(rho1,2)));
-double g22= 4* param_a * param_m * rho1 * ( pow(param_m,2) + 4 * param_a * param_m * rho1 + 4* pow(rho1,2))/ pow( pow(param_m,2) + 4 * (-1+ 2 * param_a) * param_m *rho1+4 * pow(rho1,2),2) ;
-
-
+          eTxx[ijk] += param_a * param_m * (param_m * (4 * pow(x[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))- pow(rr,2)*(pow(y[ijk],2)+pow(z[ijk],2)))+(1+param_a)* rr * (-2*pow(x[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)*(pow(y[ijk],2)+pow(z[ijk],2))))/(pow(rr*(-2* param_m + rr + param_a * rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTyy[ijk] += param_a * param_m * (2*(2* param_m -(1+ param_a) * rr ) * pow(y[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+ pow( rr , 2) * (-param_m +rr +param_a * rr) * (pow(x[ijk],2)+pow(z[ijk],2)))/(pow(rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxy[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* x[ijk] * y[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTxz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* x[ijk] * z[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTyz[ijk] += - param_a * param_m * ((1+param_a) * rr * ( 2*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2))- param_m *(4*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+pow(rr,2)))* z[ijk] * y[ijk]/(pow(rr*(-2* param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+          eTzz[ijk] += param_a * param_m *(2*(2* param_m -(1+ param_a) * rr ) * pow(z[ijk],2)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2))+ pow(rr,2) * (-param_m +rr +param_a *rr)*(pow(x[ijk],2)+pow(y[ijk],2)))/(pow(rr*(-2 * param_m + rr + param_a*rr)*(pow(x[ijk],2)+pow(y[ijk],2)+pow(z[ijk],2)),2));
+//cerr << "r=" << rr << "\n";
+ //cerr << "rho=" << rho1 << "\n";
+//cerr << "gzz=" << gzz[ijk] << "\n";
+//cerr << "x=" << x[ijk] << "\n";
+//cerr << "y=" << y[ijk] << "\n";
+//cerr << "z=" << z[ijk] << "\n";
+//cerr << "eTxx=" << eTxx[ijk] << "\n";
+//cerr << "eTyy=" << eTyy[ijk] << "\n";
+//cerr << "eTzz=" << eTzz[ijk] << "\n";
+//cerr << "eTxy=" << eTxy[ijk] << "\n";
+//cerr << "eTxz=" << eTxz[ijk] << "\n";
+//cerr << "eTyz=" << eTyz[ijk] << "\n";
+//	  }
+  //      }
       }
     }
   }
