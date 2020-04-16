@@ -9,11 +9,6 @@
 #include "math.h"
 using namespace std;
 
-#define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
-
 
 extern "C" void FakeMatter_DefineMetric(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
@@ -30,8 +25,8 @@ for (int k = 0; k < cctk_lsh[2]; ++k) {
         double zz=z[ijk];
         double yy=y[ijk];
         double rho1=sqrt((pow(yy, 2)+pow(zz, 2)+pow(xx, 2)));
-        if(rho1<1e-2){rho1=1e-2;}
-        double psi4=pow(1+param_a/(2*(rho1)),4);
+        if(rho1<1e-1){rho1=1e-1;}
+        double psi4=pow(1+param_m/(2*(rho1)),4);
 
         gxx[ijk]=psi4;gyy[ijk]=psi4;gzz[ijk]=psi4;
         alp[ijk] = sqrt(pow( (1-param_m / (2*rho1))/(1+param_m / (2*rho1)),2) * (1-param_a) + param_a) ;
