@@ -23,15 +23,24 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
         double zz=z[ijk];
         double yy=y[ijk];
      
-        double rho1 = sqrt(pow(xx,2)+pow(yy,2))+pow(zz,2);
-     //   double rho2= sqrt(pow(xx,2)+pow(yy,2));
-     //   if(rho2<1e-1)rho2=0.1;
+        double rho1 = sqrt(pow(xx,2)+pow(yy,2)+pow(zz,2));
 
   double g112= (pow(param_m,2)+4*(-1+2*param_a)*param_m*rho1+4*pow(rho1,2));
   double g111= - 8* param_turnon * param_a * param_m ;
   double g11=g111/g112;
   double g22= 4*param_turnon* param_a * param_m * rho1 * ( pow(param_m,2) + 4 * param_a * param_m * rho1 + 4* pow(rho1,2))/ pow( pow(param_m,2) + 4 * (-1+ 2 * param_a) * param_m *rho1+4 * pow(rho1,2),2) ;
-          
+
+//smooth 3 set a cut off
+/*
+          eTxx[ijk] += (g22*(pow(zz,2) + pow(yy,2))+g11*pow(xx,2)*rho1)/(pow(rho1,4));
+          eTyy[ijk] += (g22*(pow(xx,2) + pow(zz,2))+g11*pow(yy,2)*rho1)/(pow(rho1,4));
+          eTzz[ijk] += (g22*(pow(xx,2) + pow(yy,2))+g11*pow(zz,2)*rho1)/(pow(rho1,4));
+          eTxy[ijk] += xx *yy *(-g22 + g11*rho1)/(pow(rho1,4));
+          eTxz[ijk] += xx *zz *(-g22 + g11*rho1)/(pow(rho1,4));
+          eTyz[ijk] += zz *yy *(-g22 + g11*rho1)/(pow(rho1,4)) ;
+  */        
+//smooth 2 give a dd in the denominantor
+
 
           eTxx[ijk] += (g22*(pow(zz,2) + pow(yy,2))+g11*pow(xx,2)*rho1)/(pow(rho1,4)+0.01);
           eTyy[ijk] += (g22*(pow(xx,2) + pow(zz,2))+g11*pow(yy,2)*rho1)/(pow(rho1,4)+0.01);
@@ -39,7 +48,11 @@ extern "C" void FakeMatter_AddMatter2(CCTK_ARGUMENTS) {
           eTxy[ijk] += xx *yy *(-g22 + g11*rho1)/(pow(rho1,4)+0.01);
           eTxz[ijk] += xx *zz *(-g22 + g11*rho1)/(pow(rho1,4)+0.01);
           eTyz[ijk] += zz *yy *(-g22 + g11*rho1)/(pow(rho1,4)+0.01) ;          
-  /*
+
+
+
+// smooth 1 set a mim for rho
+  /* 
      
   double g112= rho1*(pow(param_m,2)+4*(-1+2*param_a)*param_m*rho1+4*pow(rho1,2));
   double g111= - 8* param_turnon * param_a * param_m ;
